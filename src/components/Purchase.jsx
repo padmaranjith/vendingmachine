@@ -1,7 +1,8 @@
 export function Purchase() {
   return (
-    <>
-      <h1>Purchase page</h1>
-    </>
+    <div className="container">
+      <h3>Vending Machine will be Availabe Soon for Purchase!!</h3>
+      <h5>See you Soon! </h5>
+    </div>
   );
 }

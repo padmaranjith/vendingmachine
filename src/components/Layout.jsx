@@ -1,5 +1,4 @@
 import { Container, Nav, Navbar } from "react-bootstrap";
-import { Link } from "react-router-dom";
 
 export default function Layout() {
   return (
@@ -10,10 +9,8 @@ export default function Layout() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link href="/home">Home</Nav.Link>
-            <Nav.Link href="/inventory">Admin</Nav.Link>
-            <Nav.Link href="/purchase">User</Nav.Link>
-            {/* <Link to="/Inventory">Admin</Link>
-            <Link to="/Purchase">User</Link> */}
+            <Nav.Link href="/manageInventory">Manage Inventory</Nav.Link>
+            <Nav.Link href="/purchase">User Purchase</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>

@@ -98,6 +98,7 @@ function ListProducts() {
         } else {
           /** Else Display Error Message */
           response.json().then((error) => {
+            setDeleteSucessMessage("");
             setErrorMessage(<Alert variant="danger">{error.message}</Alert>);
             console.log("Error in deleting the product ", error);
             fetchProducts();

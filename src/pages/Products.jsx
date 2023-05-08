@@ -125,7 +125,7 @@ function ListProducts() {
               <th hidden>ID</th>
               <th>Name</th>
               <th>Category</th>
-              <th>Price</th>
+              <th>Price(USD)</th>
               <th>Action</th>
             </tr>
           </thead>

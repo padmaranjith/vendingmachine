@@ -4,15 +4,20 @@ import { useForm } from "react-hook-form";
 
 export default function AddInventoryForm({ theInventory }) {
   /**
+   * set the available products
+   */
+  const [products, setProducts] = useState([]);
+  /**
    * Used to Display success and updated messages
    */
   const [AddSuccessMessage, setAddSucessMessage] = useState("");
   const [updateSuccessMessage, setUpdateSucessMessage] = useState("");
+  const [capacityValidateMessage, setcapacityValidateMessage] = useState("");
 
   /**
    * Sets the product values that need to be updated
    */
-  const [editinventoryId, setinventoryId] = useState(theInventory.inventoryId);
+  const [editInventoryId, setinventoryId] = useState(theInventory.inventoryId);
   const [editProductId, setProductId] = useState(
     theInventory.product && theInventory.product.productId
   );
@@ -26,14 +31,37 @@ export default function AddInventoryForm({ theInventory }) {
   const [lastRefilldate, setLastRefilldate] = useState(new Date());
 
   /**
+   * Show the list of products
+   */
+  /**
+   * Fetches the available products
+   */
+  function fetchProducts() {
+    fetch("http://localhost:8080/products")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Unexpected Server Response");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setProducts(data);
+      })
+      .catch((error) => console.log("Error: ", error));
+  }
+  useEffect(() => fetchProducts(), []);
+
+  /**
    * React Hook Form to validate and set default Values
    */
   const {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
   } = useForm({
     defaultValues: {
+      inventoryId: editInventoryId ? editInventoryId : "",
       productName: editProductName ? editProductName : "",
       maxCapacity: editMaxCapactiy ? editMaxCapactiy : "",
       availableCapacity: editavailableCapactiy ? editavailableCapactiy : "",
@@ -48,7 +76,7 @@ export default function AddInventoryForm({ theInventory }) {
    */
   const handleSave = async (formData) => {
     const newFormData = {
-      productId: formData.productId,
+      productId: parseInt(editProductId),
       maxCapacity: parseInt(formData.maxCapacity),
       availableCapacity: parseInt(formData.availableCapacity),
       lastRefilldate: new Date(),
@@ -58,13 +86,14 @@ export default function AddInventoryForm({ theInventory }) {
      * If Product Id is available, performs edit operation .
      * Else Creates a New product
      */
-    if (editinventoryId) {
+    if (editInventoryId) {
       /**
        * Update the Inventory
        * */
       try {
+        console.log(newFormData);
         const response = await fetch(
-          "http://localhost:8080/addInventory/" + editinventoryId,
+          "http://localhost:8080/addInventory/" + editInventoryId,
           {
             method: "PATCH",
             headers: {
@@ -78,12 +107,12 @@ export default function AddInventoryForm({ theInventory }) {
           setUpdateSucessMessage(
             <Alert variant="success">Inventory Updated Successfully</Alert>
           );
-          console.log("Successfully added the Inventory");
+          console.log("Successfully updated the Inventory");
         } else {
-          console.log("Error in adding the Inventory");
+          console.log("Error updating the Inventory");
         }
       } catch (error) {
-        console.log("Error in Creating a new Inventory");
+        console.log("Error in updating Inventory");
       }
     } else {
       /**
@@ -116,31 +145,38 @@ export default function AddInventoryForm({ theInventory }) {
     <div className="row">
       <div className="col-lg-8 mx-auto">
         {/* Displays success/update Messages */}
-        {AddSuccessMessage || updateSuccessMessage}
+        {AddSuccessMessage || updateSuccessMessage || capacityValidateMessage}
 
         {/* Form to display the Inventory */}
         <form onSubmit={handleSubmit(handleSave)} noValidate>
           <div className="row">
-            <label className="col-sm-8 col-form-label" htmlFor="ProductName">
-              Product Name
+            <label className="col-sm-8 col-form-label" htmlFor="Product">
+              Choose Product
             </label>
             <div className="col-sm-12">
-              <input
-                readOnly
-                className="form-control"
-                {...register("productName", {
-                  required: "This field is required",
-                  pattern: {
-                    value: /^[A-Za-z0-9 ]+$/,
-                    message: "Only accepts alphanumeric",
-                  },
+              <select
+                className="form-select"
+                {...register("productId", {
+                  required: "Please select product ",
                 })}
-                type="text"
-                placeholder="Enter Product Name"
-              />
-              <p>{errors.productName?.message}</p>
+                placeholder=" "
+              >
+                <option>{editProductName ? editProductName : ""}</option>
+                {products.map((product, index) => {
+                  if (product.productName === editProductName) {
+                    return null;
+                  }
+                  return (
+                    <option key={index} value={product.productId}>
+                      {product.productName}
+                    </option>
+                  );
+                })}
+              </select>
+              <p>{errors.productId?.message}</p>
             </div>
           </div>
+
           <div className="row">
             <label className="col-sm-8 col-form-label" htmlFor="maxCapacity">
               Max Capacity
@@ -156,7 +192,7 @@ export default function AddInventoryForm({ theInventory }) {
                     message: "Minimum  Inventory size is 1",
                   },
                   max: {
-                    value: 10,
+                    value: 50,
                     message: "Maximum Inventory size is 50",
                   },
                 })}
@@ -184,8 +220,14 @@ export default function AddInventoryForm({ theInventory }) {
                     message: "Minimum  Available size is 1",
                   },
                   max: {
-                    value: 10,
+                    value: 50,
                     message: "Maximum Available size is 50",
+                  },
+                  validate: {
+                    lessThanMaxCapacity: (value) =>
+                      value < getValues("maxCapacity")
+                        ? true
+                        : "Available capacity should be less than Max capacity",
                   },
                 })}
                 type="number"

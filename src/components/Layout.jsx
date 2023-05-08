@@ -1,10 +1,11 @@
-import { Container, Nav, Navbar } from "react-bootstrap";
+import { Container, Nav, Navbar, Row, Col } from "react-bootstrap";
+import "../index.css";
 
 export default function Layout() {
   return (
     <Navbar bg="dark" variant="dark" expand="lg">
       <Container>
-        <Navbar.Brand href="home">Vending Machine</Navbar.Brand>
+        <Navbar.Brand href="home">Snack Healthy Vending</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
@@ -20,12 +21,10 @@ export default function Layout() {
 
 export function Footer() {
   return (
-    <footer>
-      <div className="container p-3 mt-5 border-top">
-        <small className="d-block text-muted text-center">
-          &copy; Vending Machine - 2023
-        </small>
-      </div>
+    <footer className="footer fixed-bottom bg-light text-muted text-center">
+      <Container>
+        <p>&copy; Snack Healthy Vending Machine - 2023.</p>
+      </Container>
     </footer>
   );
 }

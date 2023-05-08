@@ -54,9 +54,9 @@ function GetInventorylists() {
    * setShowAddInventoryTitle(false) Show the "Edit Inventory" title in Modal
    * setSelectedProduct(product) Send the selected inventory to the AddInventory Form Component
    */
-  const handleEdit = (product) => {
+  const handleEdit = (inventory) => {
     setShow(true);
-    setSelectedInventory(product);
+    setSelectedInventory(inventory);
     setShowAddInventoryTitle(false);
     setErrorMessage("");
   };
@@ -80,11 +80,46 @@ function GetInventorylists() {
 
   useEffect(() => showInventory(), []);
 
+  /**
+   * Delete the Inventory
+   */
+  function handleDelete(inventoryId) {
+    console.log("Deleting Inventory...");
+    fetch("http://localhost:8080/deleteInventory/" + inventoryId, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Methods": "DELETE",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          /**Display delete message and available Items in Inventory*/
+          showInventory();
+          setDeleteSucessMessage(
+            <Alert variant="success">Inventory Deleted Successfully</Alert>
+          );
+        } else {
+          /** Else Display Error Message */
+          response.json().then((error) => {
+            setDeleteSucessMessage("");
+            setErrorMessage(<Alert variant="danger">{error.message}</Alert>);
+            console.log("Error in deleting the Inventory ", error);
+            showInventory();
+          });
+        }
+      })
+      .catch((error) => {
+        console.log("Error in deleting the product ", error);
+        setErrorMessage("An error occurred while deleting the product.");
+      });
+  }
+
   return (
     <>
       <div className="container">
         <h2 className="text-center mb-3">Inventory Management</h2>
-
+        {deleteSuccessMessage || errorMessage}
         <table className="table">
           <thead>
             <tr>

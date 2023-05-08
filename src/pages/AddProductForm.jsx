@@ -57,7 +57,6 @@ export default function AddProductForm({ theProduct }) {
       productName: editProductName ? editProductName : "",
       price: editPrice ? editPrice : "",
       categoryName: editCategoryName ? editCategoryName : "",
-      // categoryId: editCategoryId ? editCategoryId : "",
     },
     mode: "all",
   });
@@ -162,7 +161,7 @@ export default function AddProductForm({ theProduct }) {
           </div>
           <div className="row">
             <label className="col-sm-8 col-form-label" htmlFor="price">
-              Product Price
+              Product Price (USD)
             </label>
             <div className="col-sm-12">
               <input
@@ -203,6 +202,9 @@ export default function AddProductForm({ theProduct }) {
               >
                 <option>{editCategoryName ? editCategoryName : ""}</option>
                 {category.map((category, index) => {
+                  if (category.categoryName === editCategoryName) {
+                    return null;
+                  }
                   return (
                     <option key={index} value={category.categoryId}>
                       {category.categoryName}
